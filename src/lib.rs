@@ -1,6 +1,6 @@
-/// microns is a simple library to handling floats as fixed precision ints.
+/// microns is a simple, dependency-free, library to handling floats as fixed precision ints.
 /// microns gets its name from converting millimeter formatted f32 to an int
-/// with 10e-6 precision.
+/// with 10e-6 precision, but can be used in any case where i32::MIN < float < i32::MAX.
 use std::ops::{Add, Div, Mul, Sub};
 
 #[cfg(feature = "serde")]
@@ -60,24 +60,10 @@ impl Sub<f32> for Microns {
     }
 }
 
-impl Mul for Microns {
-    type Output = Self;
-    fn mul(self, rhs: Self) -> Self {
-        Microns(self.0 * rhs.0)
-    }
-}
-
 impl Mul<f32> for Microns {
     type Output = Self;
     fn mul(self, rhs: f32) -> Self {
         Microns::from(f32::from(self) * rhs)
-    }
-}
-
-impl Div for Microns {
-    type Output = Self;
-    fn div(self, rhs: Self) -> Self {
-        Microns(self.0 / rhs.0)
     }
 }
 
@@ -139,31 +125,11 @@ mod tests {
     }
 
     #[test]
-    fn test_mul() {
-        let a = Microns(1);
-        let b = Microns(2);
-        let c = a * b;
-        assert_eq!(c, Microns(2));
-    }
-
-    #[test]
     fn test_mul_f32() {
         let a = Microns(1);
         let b = 2.0;
         let c = a * b;
         assert_eq!(c, Microns(2));
-    }
-
-    #[test]
-    fn test_div() {
-        let a = Microns(1);
-        let b = Microns(2);
-        let c = a / b;
-        assert_eq!(c, Microns(0));
-        let a = Microns(10);
-        let b = Microns(2);
-        let c = a / b;
-        assert_eq!(c, Microns(5));
     }
 
     #[test]
