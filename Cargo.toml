@@ -5,6 +5,7 @@ edition = "2021"
 authors = ["James Dietz <jamesthespeedy@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "simple crate for float to fixed precision conversion"
+repository = "https://github.com/mj10021/microns"
 
 [dependencies]
 serde = { version = "1.0.214", optional = true, features = ["derive"] }
