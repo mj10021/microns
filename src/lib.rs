@@ -1,12 +1,21 @@
 /// microns is a simple, dependency-free, library to handling floats as fixed precision ints.
 /// microns gets its name from converting millimeter formatted f32 to an int
 /// with 10e-6 precision, but can be used in any case where i32::MIN < float < i32::MAX.
+/// This is useful for working with CNC machines, 3D printers, or any situation where
+/// micron precision is adequate and representations are traditionally formatted as floats.
 use std::ops::{Add, Div, Mul, Sub};
+
+pub fn works(val: f32) -> bool {
+    if val.is_nan() {
+        return false;
+    }
+    val > f32::from(Microns::MIN) && val < f32::from(Microns::MAX)
+}
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Microns is a simple struct that holds a i32 value,
 /// meant to be converted from a float for simplified math.
 pub struct Microns(pub i32);
@@ -22,6 +31,7 @@ impl Microns {
 }
 impl From<f32> for Microns {
     fn from(other: f32) -> Self {
+        assert!(works(other), "Value out of range");
         Microns((other * 1000.0).trunc() as i32)
     }
 }
@@ -142,5 +152,13 @@ mod tests {
         let b = 2.0;
         let c = a / b;
         assert_eq!(c, Microns(5));
+    }
+
+    #[test]
+    fn test_abs() {
+        assert_eq!(Microns(-1).abs(), Microns(1));
+        assert_eq!(Microns(-1111).abs(), Microns(1111));
+        assert_eq!(Microns(0).abs(), Microns(0));
+        assert_eq!(Microns(666).abs(), Microns(666));
     }
 }
